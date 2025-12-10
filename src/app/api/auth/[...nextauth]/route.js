@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "@/lib/db";
+import { db, ensureDb } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
 const handler = NextAuth({
@@ -15,6 +15,7 @@ const handler = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
         
         try {
+          await ensureDb();
           const result = await db.execute({
             sql: "SELECT * FROM users WHERE email = ?",
             args: [credentials.email],

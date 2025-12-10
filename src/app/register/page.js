@@ -11,11 +11,16 @@ export default function Register() {
     e.preventDefault();
     const res = await fetch("/api/register", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form)
     });
 
-    if (res.ok) router.push("/login");
-    else alert("Registration failed. Email may be taken.");
+    if (res.ok) {
+      router.push("/login");
+    } else {
+      const data = await res.json().catch(() => null);
+      alert(data?.error || "Registration failed. Please try again.");
+    }
   };
 
   return (
