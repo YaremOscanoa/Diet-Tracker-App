@@ -1,0 +1,82 @@
+Diet and Nutrition Tracker
+
+Name of the application: “NutriLog: Smart Diet Tracker”
+Introduction (The Real-World Problem):
+Many people struggle to achieve their health and fitness goals (e.g., weight loss, muscle gain, or maintenance) because they lack a clear, simple-to-understand picture of their daily nutritional intake. Manual tracking is time-consuming, logging food is often tedious and complex, and it's difficult to get actionable feedback. This leads to user frustration, inconsistency, and abandonment of health goals.
+Objectives (What the App Aims to Achieve):
+To simplify logging: Create the fastest, most intuitive meal-logging experience possible to minimize user friction.
+To provide clarity: Offer immediate, visual feedback on a user's daily intake (calories, macros) against their established goals.
+To motivate and guide: Deliver actionable feedback and progress insights that help users understand their habits and make healthier choices, transforming raw data into a personal guide.
+Features:
+Core Features:
+User Profile & Goal Setting: Onboarding process to capture user (age, weight, height, sex), activity level, and primary goal (lose, maintain, gain).
+Automated Target Calculation: Automatically sets daily calorie and macronutrient targets based on the user's profile and goals.
+Food Logging:
+Barcode Scanner: Instantly log packaged goods.
+Food Database Search: A comprehensive database of generic foods, branded products, and restaurant items.
+Manual Entry: "Quick Add" calories or manually create a custom food item with full nutrition.
+Daily Dashboard: A clear, visual homepage showing calories eaten vs. goal, a breakdown of macros (protein, carbs, fat), and a water-tracking utility.
+Chosen Additional Features:
+Recipe Builder: Allows users to input ingredients for a home-cooked meal, calculate the nutrition per serving, and save it for future logging.
+Weekly Progress Report: A simple report (delivered via notification or an in-app card) that summarizes the user's consistency, highlights successes ("You hit your protein goal 5 out of 7 days!"), and shows their weight trend.
+Technology Stack (Proposed):
+Mobile App (Frontend): React Native (or Flutter). This allows for a single codebase for both iOS and Android, speeding up development.
+Backend API: Node.js with Express. A fast, scalable, and popular choice for building RESTful APIs to handle data.
+Database: SQLite. A robust, relational database perfect for structuring user data, food logs, and saved recipes. This is ideal for a self-contained application and simplifies deployment.
+Food Database API: Edamam or FatSecret API. I will rely on a third-party service for the massive food database and barcode lookup, as building this from scratch is not feasible.
+Cloud Services: AWS (Amazon Web Services) or Google Firebase.
+Firebase is excellent for rapid development, offering authentication, database (Firestore), and hosting in one platform.
+AWS provides more long-term power and flexibility (e.g., S3 for image uploads, RDS for PostgreSQL, EC2 for the backend).
+Design Documents
+System Architecture Diagram:
+The plan is to create a diagram illustrating a client-server architecture:
+The Mobile Client (React Native) is the user's interface.
+It communicates with our Backend API (Node.js) over HTTPS.
+The Backend API is the "brain." It handles all business logic:
+It authenticates users.
+It fetches/writes user data (profiles, goals, saved recipes) to our PostgreSQL Database.
+It queries the Third-Party Food API (Edamam) for food searches and barcode data.
+It saves all logs (meal entries, water intake) to the PostgreSQL Database.
+Database Schema (Basic ER Diagram):
+I will design a schema centered around the user and their logs. The key tables (collections) will be:
+Users:
+user_id (Primary Key)
+email, password_hash
+profile_data (JSON/object: age, weight, height, goal, etc.)
+calorie_goal, protein_goal, carb_goal, fat_goal
+MealLogs:
+log_id (Primary Key)
+user_id (Foreign Key to Users)
+food_name
+calories, protein, carbs, fat
+serving_size
+meal_type (e.g., "Breakfast", "Lunch")
+created_at (Timestamp)
+CustomRecipes:
+recipe_id (Primary Key)
+user_id (Foreign Key to Users)
+recipe_name
+total_servings
+nutrition_per_serving (JSON/object)
+WaterLogs:
+water_log_id (Primary Key)
+user_id (Foreign Key to Users)
+amount_ml
+created_at (Date)
+Wireframes or Mockups:
+I will sketch out the primary user flow. The key screens to design are:
+Onboarding Screens (3-4):
+Welcome screen.
+"What is your goal?" (Lose/Maintain/Gain).
+User stats (Age, Weight, Height, Activity).
+"Here are your targets!" (Summary screen).
+Home Dashboard (The "Diary"):
+This is the main screen.
+Top: Calorie summary ("Goal" - "Food" + "Exercise" = "Remaining").
+Middle: Macro breakdown (Pie chart or bars).
+Bottom: Lists for "Breakfast," "Lunch," "Dinner," "Snacks" with a large "+" button for each.
+A separate, simple "Water" tracker.
+Logging Flow (3 screens):
+Add Food Screen: Shows a search bar, a "Barcode" icon, and tabs for "Recent," "Frequent," and "My Recipes."
+Search Results Screen: A list of food items matching the search.
+Food Details Screen: Shows nutrition for the item, allows user to change serving size/quantity, and a final "Log" button.

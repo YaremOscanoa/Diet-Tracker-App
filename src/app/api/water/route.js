@@ -15,11 +15,11 @@ export async function GET(req) {
   }
 
   const result = await db.execute({
-    sql: "SELECT * FROM meal_logs WHERE user_id = ? AND date(created_at) = date('now') ORDER BY created_at DESC",
-    args: [userId],
+    sql: "SELECT SUM(amount_ml) as total FROM water_logs WHERE user_id = ? AND date(created_at) = date('now')",
+    args: [userId]
   });
 
-  return NextResponse.json(result.rows);
+  return NextResponse.json({ total: result.rows[0]?.total || 0 });
 }
 
 export async function POST(req) {
@@ -27,7 +27,7 @@ export async function POST(req) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, calories, protein, carbs, fat, meal_type } = await req.json();
+  const { amount_ml } = await req.json();
 
   let userId = session.user.id;
   if (!userId) {
@@ -35,10 +35,15 @@ export async function POST(req) {
     userId = u.rows[0]?.id;
   }
 
-  const result = await db.execute({
-    sql: "INSERT INTO meal_logs (user_id, name, calories, protein, carbs, fat, meal_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    args: [userId, name, parseInt(calories) || 0, parseInt(protein) || 0, parseInt(carbs) || 0, parseInt(fat) || 0, meal_type || 'snack'],
+  await db.execute({
+    sql: "INSERT INTO water_logs (user_id, amount_ml) VALUES (?, ?)",
+    args: [userId, parseInt(amount_ml) || 0]
   });
 
-  return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
+  const result = await db.execute({
+    sql: "SELECT SUM(amount_ml) as total FROM water_logs WHERE user_id = ? AND date(created_at) = date('now')",
+    args: [userId]
+  });
+
+  return NextResponse.json({ total: result.rows[0]?.total || 0 }, { status: 201 });
 }

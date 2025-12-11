@@ -2,10 +2,18 @@
 import { useState } from "react";
 import { Search, Plus } from "lucide-react";
 
+const MEAL_TYPES = [
+  { value: "breakfast", label: "Breakfast" },
+  { value: "lunch", label: "Lunch" },
+  { value: "dinner", label: "Dinner" },
+  { value: "snack", label: "Snack" }
+];
+
 export default function MealForm({ onMealAdded }) {
-  const [activeTab, setActiveTab] = useState("search"); // 'search' or 'manual'
+  const [activeTab, setActiveTab] = useState("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [mealType, setMealType] = useState("breakfast");
   const [manual, setManual] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "" });
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +30,8 @@ export default function MealForm({ onMealAdded }) {
   const addFood = async (foodData) => {
     await fetch("/api/meals", {
       method: "POST",
-      body: JSON.stringify(foodData),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...foodData, meal_type: mealType }),
     });
     onMealAdded();
     setResults([]);
@@ -43,8 +52,28 @@ export default function MealForm({ onMealAdded }) {
           onClick={() => setActiveTab("manual")} 
           className={`pb-2 ${activeTab === "manual" ? "border-b-2 border-blue-500 font-bold" : "text-gray-500"}`}
         >
-          Manual Add
+          Quick Add
         </button>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Meal Type</label>
+        <div className="flex gap-2 flex-wrap">
+          {MEAL_TYPES.map((type) => (
+            <button
+              key={type.value}
+              type="button"
+              onClick={() => setMealType(type.value)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                mealType === type.value
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === "search" ? (
@@ -68,19 +97,19 @@ export default function MealForm({ onMealAdded }) {
                 <div>
                   <p className="font-semibold">{item.food.label}</p>
                   <p className="text-xs text-gray-500">
-                    {Math.round(item.food.nutrients.ENERC_KCAL)} cal | 
-                    P: {Math.round(item.food.nutrients.PROCNT)}g | 
-                    C: {Math.round(item.food.nutrients.CHOCDF)}g | 
-                    F: {Math.round(item.food.nutrients.FAT)}g
+                    {Math.round(item.food.nutrients.ENERC_KCAL || 0)} cal | 
+                    P: {Math.round(item.food.nutrients.PROCNT || 0)}g | 
+                    C: {Math.round(item.food.nutrients.CHOCDF || 0)}g | 
+                    F: {Math.round(item.food.nutrients.FAT || 0)}g
                   </p>
                 </div>
                 <button 
                   onClick={() => addFood({
                     name: item.food.label,
-                    calories: Math.round(item.food.nutrients.ENERC_KCAL),
-                    protein: Math.round(item.food.nutrients.PROCNT),
-                    carbs: Math.round(item.food.nutrients.CHOCDF),
-                    fat: Math.round(item.food.nutrients.FAT),
+                    calories: Math.round(item.food.nutrients.ENERC_KCAL || 0),
+                    protein: Math.round(item.food.nutrients.PROCNT || 0),
+                    carbs: Math.round(item.food.nutrients.CHOCDF || 0),
+                    fat: Math.round(item.food.nutrients.FAT || 0),
                   })}
                   className="text-blue-600 bg-blue-50 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
