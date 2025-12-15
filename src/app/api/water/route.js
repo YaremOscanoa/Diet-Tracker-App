@@ -47,3 +47,49 @@ export async function POST(req) {
 
   return NextResponse.json({ total: result.rows[0]?.total || 0 }, { status: 201 });
 }
+
+export async function DELETE(req) {
+  await ensureDb();
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  let userId = session.user.id;
+  if (!userId) {
+    const u = await db.execute({ sql: "SELECT id FROM users WHERE email = ?", args: [session.user.email] });
+    userId = u.rows[0]?.id;
+  }
+
+  await db.execute({
+    sql: "DELETE FROM water_logs WHERE user_id = ? AND date(created_at) = date('now')",
+    args: [userId]
+  });
+
+  return NextResponse.json({ total: 0 });
+}
+
+export async function PATCH(req) {
+  await ensureDb();
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { reduce_ml } = await req.json();
+
+  let userId = session.user.id;
+  if (!userId) {
+    const u = await db.execute({ sql: "SELECT id FROM users WHERE email = ?", args: [session.user.email] });
+    userId = u.rows[0]?.id;
+  }
+
+  await db.execute({
+    sql: "INSERT INTO water_logs (user_id, amount_ml) VALUES (?, ?)",
+    args: [userId, -(parseInt(reduce_ml) || 0)]
+  });
+
+  const result = await db.execute({
+    sql: "SELECT SUM(amount_ml) as total FROM water_logs WHERE user_id = ? AND date(created_at) = date('now')",
+    args: [userId]
+  });
+
+  const total = Math.max(0, result.rows[0]?.total || 0);
+  return NextResponse.json({ total });
+}
