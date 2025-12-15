@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Calendar, Plus, Trash2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, Plus, Trash2, Sparkles, ChevronDown, ChevronUp, CalendarDays } from "lucide-react";
 import MealPlanEditor from "./MealPlanEditor";
+import WeeklyMealPlanner from "./WeeklyMealPlanner";
 
 export default function MealPlanSection({ calorieGoal }) {
   const [plans, setPlans] = useState([]);
   const [showEditor, setShowEditor] = useState(false);
+  const [showWeeklyPlanner, setShowWeeklyPlanner] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -113,12 +115,19 @@ export default function MealPlanSection({ calorieGoal }) {
         </div>
         <div className="flex gap-2">
           <button
+            onClick={() => setShowWeeklyPlanner(true)}
+            className="flex items-center gap-1 text-sm px-3 py-1.5 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+          >
+            <CalendarDays size={14} />
+            Weekly
+          </button>
+          <button
             onClick={generatePlan}
             disabled={generating}
             className="flex items-center gap-1 text-sm px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors disabled:opacity-50"
           >
             <Sparkles size={14} />
-            {generating ? "Generating..." : "Suggest"}
+            {generating ? "..." : "Day"}
           </button>
           <button
             onClick={() => setShowEditor(true)}
@@ -187,6 +196,9 @@ export default function MealPlanSection({ calorieGoal }) {
                   {plan.plan_type === 'auto' && (
                     <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-600 rounded">Auto</span>
                   )}
+                  {plan.plan_type === 'weekly' && (
+                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-600 rounded">Weekly</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-gray-500">{plan.total_calories} cal</span>
@@ -219,6 +231,14 @@ export default function MealPlanSection({ calorieGoal }) {
           calorieGoal={calorieGoal}
           onSave={savePlan}
           onClose={() => setShowEditor(false)}
+        />
+      )}
+
+      {showWeeklyPlanner && (
+        <WeeklyMealPlanner
+          calorieGoal={calorieGoal}
+          onClose={() => setShowWeeklyPlanner(false)}
+          onSaved={fetchPlans}
         />
       )}
     </div>

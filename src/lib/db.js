@@ -67,9 +67,15 @@ async function initSchema() {
       name TEXT NOT NULL,
       plan_type TEXT DEFAULT 'custom',
       total_calories INTEGER DEFAULT 0,
+      calorie_adjustment TEXT DEFAULT 'normal',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  try {
+    await db.execute(`ALTER TABLE meal_plans ADD COLUMN calorie_adjustment TEXT DEFAULT 'normal'`);
+  } catch (e) {
+  }
 
   await db.execute(`
     CREATE TABLE IF NOT EXISTS meal_plan_items (

@@ -37,7 +37,16 @@ export const mealCatalog = {
   ]
 };
 
-export function generateMealPlan(calorieGoal) {
+export const calorieAdjustments = {
+  less: { label: "Eat Less", multiplier: 0.8, color: "text-blue-600", bg: "bg-blue-100" },
+  normal: { label: "Normal", multiplier: 1.0, color: "text-green-600", bg: "bg-green-100" },
+  more: { label: "Eat More", multiplier: 1.2, color: "text-orange-600", bg: "bg-orange-100" }
+};
+
+export function generateMealPlan(calorieGoal, adjustment = 'normal') {
+  const multiplier = calorieAdjustments[adjustment]?.multiplier || 1.0;
+  const adjustedGoal = Math.round(calorieGoal * multiplier);
+  
   const distribution = {
     breakfast: 0.30,
     lunch: 0.35,
@@ -52,7 +61,7 @@ export function generateMealPlan(calorieGoal) {
   let totalFat = 0;
 
   for (const [mealType, percentage] of Object.entries(distribution)) {
-    const targetCalories = calorieGoal * percentage;
+    const targetCalories = adjustedGoal * percentage;
     const foods = mealCatalog[mealType];
     
     const closest = foods.reduce((prev, curr) => {
@@ -68,6 +77,8 @@ export function generateMealPlan(calorieGoal) {
 
   return {
     meals: plan,
+    adjustment,
+    targetCalories: adjustedGoal,
     totals: {
       calories: totalCalories,
       protein: totalProtein,
@@ -75,4 +86,16 @@ export function generateMealPlan(calorieGoal) {
       fat: totalFat
     }
   };
+}
+
+export function generateWeeklyPlan(calorieGoal, adjustments = {}) {
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const weekPlan = {};
+  
+  days.forEach(day => {
+    const adjustment = adjustments[day] || 'normal';
+    weekPlan[day] = generateMealPlan(calorieGoal, adjustment);
+  });
+  
+  return weekPlan;
 }

@@ -168,10 +168,8 @@ export default function Dashboard() {
       <main className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
         <DailyTip />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <GoalCard goals={goals} total={totalIntake} />
-          <BMICard />
-        </div>
+        <GoalCard goals={goals} total={totalIntake} />
+        <BMICard />
         
         <MealPlanSection calorieGoal={goals?.calorie_goal || 2000} />
         
