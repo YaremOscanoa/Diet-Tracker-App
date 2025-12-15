@@ -10,6 +10,8 @@ import GoalEditor from "@/components/GoalEditor";
 import WeeklyReport from "@/components/WeeklyReport";
 import QuickAddFoods from "@/components/QuickAddFoods";
 import DailyTip from "@/components/DailyTip";
+import BMICard from "@/components/BMICard";
+import MealPlanSection from "@/components/MealPlanSection";
 import { LogOut, Settings, BarChart2 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -166,7 +168,12 @@ export default function Dashboard() {
       <main className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
         <DailyTip />
         
-        <GoalCard goals={goals} total={totalIntake} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <GoalCard goals={goals} total={totalIntake} />
+          <BMICard />
+        </div>
+        
+        <MealPlanSection calorieGoal={goals?.calorie_goal || 2000} />
         
         <WaterTracker 
           water={water} 

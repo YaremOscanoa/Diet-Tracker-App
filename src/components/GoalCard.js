@@ -4,7 +4,7 @@ export default function GoalCard({ goals, total }) {
   const remaining = goals.calorie_goal - total.calories;
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div className="flex flex-col md:flex-row items-center gap-8">
         
         {/* Chart Section */}

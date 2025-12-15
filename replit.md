@@ -13,6 +13,8 @@ A simple, smart nutrition tracking companion built with Next.js. Users can regis
 - **Goals Editing**: Manually adjust calorie and macro targets
 - **Water Tracking**: Track daily water intake with quick-add buttons
 - **Weekly Progress Report**: Summary of consistency, goal achievement, and daily averages
+- **BMI Display**: Calculate and display user's BMI with category indicator (Underweight/Normal/Overweight/Obese)
+- **Meal Planning**: Generate suggested meal plans based on calorie goals or create custom meal plans
 
 ## Project Structure
 - `src/app/` - Next.js 14 App Router pages and API routes
@@ -29,10 +31,11 @@ A simple, smart nutrition tracking companion built with Next.js. Users can regis
   - `register/` - Registration page
   - `onboarding/` - Onboarding wizard
 - `src/components/` - React components
-  - GoalCard, MacroChart, MealForm, MealHistory, WaterTracker, GoalEditor, WeeklyReport, Providers
+  - GoalCard, MacroChart, MealForm, MealHistory, WaterTracker, GoalEditor, WeeklyReport, Providers, QuickAddFoods, DailyTip, BMICard, MealPlanSection, MealPlanEditor
 - `src/lib/` - Shared utilities
   - `db.js` - Database connection using libsql (SQLite)
   - `auth.js` - NextAuth.js configuration
+  - `mealCatalog.js` - Static meal catalog with common foods and meal plan generation
 
 ## Technology Stack
 - **Framework**: Next.js 14.1.0 (App Router)
@@ -60,6 +63,8 @@ The app auto-creates these tables on first run:
 - `user_goals` - Nutritional goals (user_id, calorie_goal, protein_goal, carbs_goal, fat_goal)
 - `meal_logs` - Meal entries (id, user_id, name, calories, protein, carbs, fat, meal_type, created_at)
 - `water_logs` - Water intake entries (id, user_id, amount_ml, created_at)
+- `meal_plans` - Saved meal plans (id, user_id, plan_date, name, plan_type, total_calories, created_at)
+- `meal_plan_items` - Items within meal plans (id, meal_plan_id, meal_type, food_name, calories, protein, carbs, fat, order_index)
 
 ## TDEE Calculation
 Uses the Mifflin-St Jeor formula:
